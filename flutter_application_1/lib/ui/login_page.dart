@@ -12,13 +12,17 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+
+  bool _showClue = false;
+  static const String _clueText = "Username: isyraffajar, Password: 140";
+
   String get username => _usernameController.text.trim();
 
   void _login() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username == "Isyraffajar" && password == "140") {
+    if (username == "isyraffajar" && password == "140") {
       setState(() => _errorMessage = null);
       Navigator.pushReplacement(
         context,
@@ -28,12 +32,36 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      setState(() => _errorMessage = "Username atau password salah.");
+      if (username.isNotEmpty && password.isNotEmpty) {
+        setState(
+          () => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Login gagal, pastikan username dan password benar!",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+            ),
+          ),
+        );
+      }
     }
 
     if (username.isEmpty || password.isEmpty) {
       setState(
-        () => _errorMessage = "Username dan password tidak boleh kosong.",
+        () => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Username dan password tidak boleh kosong!",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+          ),
+        ),
       );
       return;
     }
@@ -42,6 +70,17 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Login",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.brown,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -96,18 +135,26 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20),
 
-                    SizedBox(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          side: BorderSide(color: Colors.green),
+                    if (_showClue)
+                      const Text(
+                        _clueText,
+                        style: TextStyle(color: Colors.green),
+                      ),
+
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(
+                          color: _showClue ? Colors.red : Colors.green,
                         ),
-                        onPressed: () {
-                          _login;
-                        },
-                        child: Text(
-                          "Show Clue",
-                          style: TextStyle(fontSize: 10),
-                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showClue = !_showClue;
+                        });
+                      },
+                      child: Text(
+                        _showClue ? "Tutup" : "Clue",
+                        style: TextStyle(fontSize: 10),
                       ),
                     ),
                   ],
